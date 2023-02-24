@@ -9,16 +9,17 @@ from io import BytesIO
 import logging
 
 API = "5cf098f5fb66d2693ac64dd801381bc7"
+CITY = 'Lutsk'
 
 
 def get_weather(city):
-    request = requests.get(f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API}')
+    request = requests.get(f'https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API}')
     return request
 
 
 def get_icon():
     # get images by url
-    url = f"http://openweathermap.org/img/w/{get_weather('Lutsk').json()['weather'][0]['icon']}.png"
+    url = f"https://openweathermap.org/img/w/{get_weather('Lutsk').json()['weather'][0]['icon']}.png"
     response = requests.get(url)
     icon_data = response.content
     img = Image.open(BytesIO(icon_data))
@@ -27,9 +28,10 @@ def get_icon():
 
 
 def get_temperature():
-    # "https://api.openweathermap.org/data/3.0/onecall?lat=33.44&lon=-94.04&exclude=hourly,daily&appid={API}"
-    return get_weather('Lutsk').json()['main']['temp']
-
+    url = f"https://api.openweathermap.org/data/2.5/onecall?lat=50.7593&lon=25.3424&exclude=daily&units=metric&appid={API}"
+    response = requests.get(url)
+    temp = response.json()['current']['temp']
+    return round(temp)
 
 def get_description():
     return get_weather('Lutsk').json()['weather'][0]['description']
@@ -41,13 +43,13 @@ def more_details():
 
 def display():
     window = tk.Tk()
-    window.title(f"Weather in {get_weather('Lutsk')}")
+    window.title(f"Weather in {get_weather(CITY)}")
     window.geometry("400x400")
     # insert data from functions on main display
     img = ImageTk.PhotoImage(get_icon())
     icons = tk.Label(window, image=img, height=200, width=200)
-    temperature = tk.Label(window, text=get_temperature())
-    description = tk.Label(window, text=get_description())
+    temperature = tk.Label(window, text=f"{get_temperature()} Celcium", font=("Arial", 15))
+    description = tk.Label(window, text=get_description(), font=("Arial", 15))
     details = tk.Label(window, text=more_details(), wraplength=400)
     # use grid to structure data
     icons.grid(row=0, column=0)
@@ -59,5 +61,4 @@ def display():
 
 
 if __name__ == "__main__":
-    get_icon()
     display()
