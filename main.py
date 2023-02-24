@@ -44,21 +44,22 @@ def more_details():
 def display():
     window = tk.Tk()
     window.title(f"Weather in {get_weather(CITY)}")
-    window.geometry("400x400")
+    window.geometry('400x400')
     # insert data from functions on main display
     img = ImageTk.PhotoImage(get_icon())
     icons = tk.Label(window, image=img, height=200, width=200)
     temperature = tk.Label(window, text=f"{get_temperature()} Celcium", font=("Arial", 15))
     description = tk.Label(window, text=get_description(), font=("Arial", 15))
     details = tk.Label(window, text=more_details(), wraplength=400)
-    # use grid to structure data
-    icons.grid(row=0, column=0)
-    temperature.grid(row=0, column=1)
-    description.grid(row=1, column=1)
-    details.grid(row=2, column=0, columnspan=2)
+    # need to change from grid into place
+    icons.grid(column=0, rowspan=2)
+    temperature.grid(row = 0, column = 1, pady=5)
+    description.grid(row=1, column=1, pady=5)
+    details.place(x=0, y=300, width=400, height=100)
 
     window.mainloop()
 
 
 if __name__ == "__main__":
-    display()
+    # display()
+    print(more_details())
