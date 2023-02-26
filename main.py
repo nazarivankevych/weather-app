@@ -38,28 +38,40 @@ def get_description():
 
 
 def more_details():
-    return get_weather('Lutsk').json()
+    """_summary_
+
+    Returns:
+        json: dict(),
+        main: ['humidity', 'pressure'],
+        wind: ['speed']
+    """
+    info = ''
+    for key, value in get_weather('Lutsk').json().items():
+        if key == 'main':
+            info += f'Humidity: {value["humidity"]}\nPressure: {value["pressure"]}\n'
+        elif key == 'Wind':
+            info += f'{key}: {value["speed"]} m/s\n'
+    return info
 
 
 def display():
     window = tk.Tk()
-    window.title(f"Weather in {get_weather(CITY)}")
-    window.geometry('400x400')
+    window.title(f"Weather in {CITY}")
+    window.geometry('550x380')
     # insert data from functions on main display
     img = ImageTk.PhotoImage(get_icon())
     icons = tk.Label(window, image=img, height=200, width=200)
-    temperature = tk.Label(window, text=f"{get_temperature()} Celcium", font=("Arial", 15))
-    description = tk.Label(window, text=get_description(), font=("Arial", 15))
-    details = tk.Label(window, text=more_details(), wraplength=400)
+    temperature = tk.Label(window, text=f"{get_temperature()} °C", font=("Arial", 30))
+    description = tk.Label(window, text=get_description(), font=("Arial", 30))
+    details = tk.Label(window, text=more_details(), wraplength=400, font=("Arial", 15))
     # need to change from grid into place
     icons.grid(column=0, rowspan=2)
     temperature.grid(row = 0, column = 1, pady=5)
     description.grid(row=1, column=1, pady=5)
-    details.place(x=0, y=300, width=400, height=100)
+    details.place(x=550/2, y=300, width=380, height=100)
 
     window.mainloop()
 
 
 if __name__ == "__main__":
-    # display()
-    print(more_details())
+    display()
