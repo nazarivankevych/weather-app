@@ -2,11 +2,14 @@
 # 5cf098f5fb66d2693ac64dd801381bc7 - api openweather
 
 
-import requests
 import tkinter as tk
 from PIL import Image, ImageTk
 from io import BytesIO
-import logging
+import time
+import threading
+
+import requests
+
 
 API = "5cf098f5fb66d2693ac64dd801381bc7"
 CITY = 'Lutsk'
@@ -15,6 +18,10 @@ CITY = 'Lutsk'
 def get_weather(city):
     request = requests.get(f'https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API}')
     return request
+
+
+t = threading.Thread(target=get_weather, args=(CITY,))
+t.start()
 
 
 def get_icon():
