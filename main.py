@@ -5,8 +5,6 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 from io import BytesIO
-import time
-import threading
 
 import requests
 
@@ -16,12 +14,9 @@ CITY = 'Lutsk'
 
 
 def get_weather(city):
-    request = requests.get(f'https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API}')
+    request = requests.get(
+        f'https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API}')
     return request
-
-
-t = threading.Thread(target=get_weather, args=(CITY,))
-t.start()
 
 
 def get_icon():
@@ -39,6 +34,7 @@ def get_temperature():
     response = requests.get(url)
     temp = response.json()['current']['temp']
     return round(temp)
+
 
 def get_description():
     return get_weather('Lutsk').json()['weather'][0]['description']
@@ -68,12 +64,13 @@ def display():
     # insert data from functions on main display
     img = ImageTk.PhotoImage(get_icon())
     icons = tk.Label(window, image=img, height=200, width=200)
-    temperature = tk.Label(window, text=f"{get_temperature()} °C", font=("Arial", 30))
+    temperature = tk.Label(
+        window, text=f"{get_temperature()} °C", font=("Arial", 30))
     description = tk.Label(window, text=get_description(), font=("Arial", 30))
-    details = tk.Label(window, text=more_details(), wraplength=400, font=("Arial", 15))
-    # need to change from grid into place
+    details = tk.Label(window, text=more_details(),
+                       wraplength=400, font=("Arial", 15))
     icons.grid(column=0, rowspan=2)
-    temperature.grid(row = 0, column = 1, pady=5)
+    temperature.grid(row=0, column=1, pady=5)
     description.grid(row=1, column=1, pady=5)
     details.place(x=550/2, y=300, width=380, height=100)
 
