@@ -2,7 +2,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from io import BytesIO
 import requests
-
+from PIL.Image import Resampling
 
 API_KEY = "5cf098f5fb66d2693ac64dd801381bc7"
 CITY = "Lutsk"
@@ -22,7 +22,7 @@ def get_icon():
     response = requests.get(url)
     icon_data = response.content
     img = Image.open(BytesIO(icon_data))
-    img = img.resize((150, 150), Image.LANCZOS)
+    img = img.resize((150, 150), Resampling.LANCZOS)
     return img
 
 
@@ -66,18 +66,40 @@ def display():
     window = tk.Tk()
     window.title(f"Weather in {CITY}")
     window.geometry("550x380")
+    window.resizable(False, False)
+    # window.configure(bg="#3d3d3d")
 
     # Insert data from functions on main display
     img = ImageTk.PhotoImage(get_icon())
     icons = tk.Label(window, image=img, height=200, width=200)
-    temperature = tk.Label(window, text=f"{get_temperature()} °C", font=("Arial", 30))
-    description = tk.Label(window, text=get_description(), font=("Arial", 30))
-    details = tk.Label(window, text=get_details(), wraplength=400, font=("Arial", 15))
+    temperature = tk.Label(
+        window,
+        text=f"{get_temperature()} °C",
+        font=("Helvetica", 40, "bold"),
+        fg="#ffffff",
+        bg="#3d3d3d"
+    )
+    description = tk.Label(
+        window,
+        text=get_description(),
+        font=("Helvetica", 20),
+        fg="#ffffff",
+        bg="#3d3d3d"
+    )
+    details = tk.Label(
+        window,
+        text=get_details(),
+        wraplength=400,
+        font=("Helvetica", 12),
+        fg="#ffffff",
+        bg="#3d3d3d",
+        justify="left",
+        anchor="w"
+    )
     icons.grid(column=0, rowspan=2)
     temperature.grid(row=0, column=1, pady=5)
     description.grid(row=1, column=1, pady=5)
-    details.place(x=550 / 2, y=300, width=380, height=100)
-
+    details.place(x=430, y=300)
     # Schedule next update
     window.after(600000, update_data)  # update every 10 minutes
 
