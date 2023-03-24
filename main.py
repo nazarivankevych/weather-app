@@ -1,27 +1,24 @@
-# Weather app: Develop a weather app that displays the current weather for a given location using an API.
-# 5cf098f5fb66d2693ac64dd801381bc7 - api openweather
-
-
 import tkinter as tk
 from PIL import Image, ImageTk
 from io import BytesIO
-
 import requests
 
 
-API = "5cf098f5fb66d2693ac64dd801381bc7"
-CITY = 'Lutsk'
+API_KEY = "5cf098f5fb66d2693ac64dd801381bc7"
+CITY = "Lutsk"
+LATITUDE = "50.7593"
+LONGITUDE = "25.3424"
 
 
 def get_weather(city):
     request = requests.get(
-        f'https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API}')
+        f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}"
+    )
     return request
 
 
 def get_icon():
-    # get images by url
-    url = f"https://openweathermap.org/img/w/{get_weather('Lutsk').json()['weather'][0]['icon']}.png"
+    url = f"https://openweathermap.org/img/w/{get_weather(CITY).json()['weather'][0]['icon']}.png"
     response = requests.get(url)
     icon_data = response.content
     img = Image.open(BytesIO(icon_data))
@@ -30,49 +27,59 @@ def get_icon():
 
 
 def get_temperature():
-    url = f"https://api.openweathermap.org/data/2.5/onecall?lat=50.7593&lon=25.3424&exclude=daily&units=metric&appid={API}"
+    url = f"https://api.openweathermap.org/data/2.5/onecall?lat={LATITUDE}&lon={LONGITUDE}&exclude=daily&units=metric&appid={API_KEY}"
     response = requests.get(url)
-    temp = response.json()['current']['temp']
+    temp = response.json()["current"]["temp"]
     return round(temp)
 
 
 def get_description():
-    return get_weather('Lutsk').json()['weather'][0]['description']
+    return get_weather(CITY).json()["weather"][0]["description"]
 
 
-def more_details():
-    """_summary_
+def get_details():
+    """Get additional weather details
 
     Returns:
-        json: dict(),
-        main: ['humidity', 'pressure'],
-        wind: ['speed']
+        str: Additional weather details
     """
-    info = ''
-    for key, value in get_weather('Lutsk').json().items():
-        if key == 'main':
+    info = ""
+    for key, value in get_weather(CITY).json().items():
+        if key == "main":
             info += f'Humidity: {value["humidity"]}\nPressure: {value["pressure"]}\n'
-        elif key == 'Wind':
-            info += f'{key}: {value["speed"]} m/s\n'
+        elif key == "wind":
+            info += f'{key.title()}: {value["speed"]} m/s\n'
     return info
+
+
+def update_data():
+    """Update the displayed data"""
+    temperature.config(text=f"{get_temperature()} °C")
+    description.config(text=get_description())
+    details.config(text=get_details())
+    img = ImageTk.PhotoImage(get_icon())
+    icons.config(image=img)
+    icons.image = img  # prevent garbage collection of image object
 
 
 def display():
     window = tk.Tk()
     window.title(f"Weather in {CITY}")
-    window.geometry('550x380')
-    # insert data from functions on main display
+    window.geometry("550x380")
+
+    # Insert data from functions on main display
     img = ImageTk.PhotoImage(get_icon())
     icons = tk.Label(window, image=img, height=200, width=200)
-    temperature = tk.Label(
-        window, text=f"{get_temperature()} °C", font=("Arial", 30))
+    temperature = tk.Label(window, text=f"{get_temperature()} °C", font=("Arial", 30))
     description = tk.Label(window, text=get_description(), font=("Arial", 30))
-    details = tk.Label(window, text=more_details(),
-                       wraplength=400, font=("Arial", 15))
+    details = tk.Label(window, text=get_details(), wraplength=400, font=("Arial", 15))
     icons.grid(column=0, rowspan=2)
     temperature.grid(row=0, column=1, pady=5)
     description.grid(row=1, column=1, pady=5)
-    details.place(x=550/2, y=300, width=380, height=100)
+    details.place(x=550 / 2, y=300, width=380, height=100)
+
+    # Schedule next update
+    window.after(600000, update_data)  # update every 10 minutes
 
     window.mainloop()
 
